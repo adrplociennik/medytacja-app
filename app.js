@@ -1097,7 +1097,20 @@ function init(){
       localStorage.setItem(STORE.tutorial,"1");
     }
     if("serviceWorker" in navigator){
-      window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(error=>console.warn("SW",error)));
+      let reloading=false;
+      navigator.serviceWorker.addEventListener("controllerchange",()=>{
+        if(reloading)return;
+        reloading=true;
+        location.reload();
+      });
+      window.addEventListener("load",async()=>{
+        try{
+          const registration=await navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"});
+          await registration.update();
+        }catch(error){
+          console.warn("SW",error);
+        }
+      });
     }
   }catch(error){
     markAppError(error);
