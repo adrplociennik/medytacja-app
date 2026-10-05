@@ -1,0 +1,29 @@
+name: Validate Still
+
+on:
+  push:
+    branches:
+      - feat/professional-meditation-pwa
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check JavaScript syntax
+        run: node --check app.js
+
+      - name: Validate HTML structure
+        run: python3 scripts/validate.py
+
+      - name: Check shell scripts
+        run: |
+          bash -n scripts/download-audio.sh
+          bash -n deploy/install-ubuntu.sh
