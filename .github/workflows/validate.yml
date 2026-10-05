@@ -27,3 +27,22 @@ jobs:
         run: |
           bash -n scripts/download-audio.sh
           bash -n deploy/install-ubuntu.sh
+
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install browser test tools
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Start Still
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/still-http.log 2>&1 &
+          sleep 2
+
+      - name: Click through mobile and desktop flows
+        run: npx playwright test tests/e2e.spec.js --project=chromium --reporter=line
