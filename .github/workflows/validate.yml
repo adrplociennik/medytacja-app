@@ -1,11 +1,10 @@
 name: Validate Still
 
 on:
+  pull_request:
   push:
     branches:
-      - feat/professional-meditation-pwa
       - main
-  pull_request:
 
 permissions:
   contents: read
