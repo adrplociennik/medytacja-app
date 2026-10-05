@@ -1,44 +1,103 @@
-# Still — prywatna aplikacja do medytacji
+# Still — prywatna aplikacja medytacyjna PWA
 
-Mobilna aplikacja webowa/PWA zbudowana do prywatnego użycia: bez kont, reklam, śledzenia i backendu. Działa jak aplikacja na telefonie, może zostać dodana do ekranu głównego i po pierwszym użyciu działa również offline.
+Still to pełnoprawna, prywatna aplikacja webowa do medytacji, oddechu, snu, koncentracji i soundscape'ów. Jest projektowana **mobile-first**, ale od V2 ma również pełny układ desktopowy z boczną nawigacją i szerokim dashboardem.
 
-## Co już zawiera
+Nie wymaga konta, backendu, Dockera ani frameworka JS. Dane użytkownika pozostają w `localStorage`.
 
-- szybkie sesje: **3 min reset**, **7 min oczyszczająca**, **20 min głęboka**
-- biblioteka: mindful breathing, body scan, loving-kindness, open monitoring, długa praktyka 30 min
-- własny timer 1–60 min
-- pełnoekranowy player z etapami, postępem, pauzą i przeskakiwaniem
-- **soundscape mixer** — kilka prawdziwych nagrań jednocześnie, osobna głośność każdej warstwy
-- prawdziwe audio: deszcz, ocean, las/ptaki, ogień, wiatr, dzwonki
-- generator czystych tonów 432/528 Hz oraz binaural beats 10 Hz / 6 Hz
-- historia sesji, łączny czas i streak przechowywane wyłącznie w `localStorage`
-- Wake Lock podczas sesji, Media Session na wspieranych urządzeniach
-- PWA + Service Worker + cache offline
-- tutorial pierwszego uruchomienia
-- zero zależności JS, zero procesu buildowania, zero Dockera
+## Still V2
 
-## Dlaczego taki zakres
+### Personalizacja
+- check-in: samopoczucie + cel + dostępny czas,
+- lokalny silnik rekomendacji dobierający praktykę,
+- check-in po sesji 1–5 i prywatny trend samopoczucia,
+- ulubione praktyki,
+- eksport/import prywatnych danych.
 
-Popularne aplikacje medytacyjne łączą dziś biblioteki praktyk, timer, soundscape'y, ćwiczenia oddechowe, treści do snu, pobieranie/offline i statystyki. Still bierze z tego tylko elementy przydatne w prywatnej aplikacji, bez abonamentu, społeczności i nadmiaru treści.
+### Medytacje
+- SOS 2 min,
+- szybki reset 3 min,
+- 5 minut ciszej,
+- oczyszczająca 7 min,
+- spokojny start 8 min,
+- zejście do snu 10 min,
+- focus 10 min,
+- loving-kindness 10 min,
+- body scan 12 min,
+- po intensywnym dniu 15 min,
+- open monitoring 15 min,
+- głęboka medytacja 20 min,
+- Deep Focus 25 min,
+- pełna praktyka 30 min,
+- własny timer 1–90 min.
 
-Praktyki są oparte na powszechnie używanych formatach mindfulness: koncentracji na oddechu, body scan, otwartej obserwacji oraz loving-kindness. Aplikacja jest narzędziem wellbeing, a nie leczeniem. Generator częstotliwości celowo **nie** obiecuje efektów medycznych ani „uzdrawiania” konkretnymi Hz.
+### Gongi i player
+- gong na początku,
+- gong między etapami,
+- trzy uderzenia na zakończenie,
+- przełącznik gongu bez wychodzenia z playera,
+- 3 charakterystyki: **ciepła misa**, **głęboki gong**, **jasny dzwonek**,
+- regulacja głośności,
+- generowanie gongu przez Web Audio — działa offline i nie wymaga sampla,
+- Wake Lock i Media Session.
 
-## Audio — prawdziwe nagrania
+### Breath Lab
+- spokojny 4–6,
+- równy 5–5,
+- box breathing 4–4–4–4,
+- 4–7–8,
+- animowany orb,
+- odliczanie faz,
+- opcjonalna haptyka,
+- zmiana długości ćwiczenia.
 
-Źródła zostały ręcznie dobrane z Wikimedia Commons. Wszystkie użyte pozycje są oznaczone jako public domain albo CC0. Pełna tabela: [AUDIO_LICENSES.md](./AUDIO_LICENSES.md).
+### Sleep Mode
+- szybki wybór deszczu, oceanu albo kominka,
+- timer 20/30/45/60/90 min,
+- automatyczny pięciominutowy fade-out,
+- osobna medytacja do snu.
 
-Pobierz pliki:
+### Soundscape mixer
+- niezależna głośność każdej warstwy,
+- master volume,
+- gotowe sceny,
+- zapis i odtworzenie własnego miksu,
+- lokalne audio + awaryjne URL-e źródłowe,
+- PWA cache audio.
+
+### Audio HD
+Aktualny bank zawiera deszcz, wielominutową burzę, ocean HD, las, ogień, wiatr i dzwonki. Ocean został podmieniony na public-domain field recording **4:47 / 485 kbps**, a dodatkowa warstwa deszczu/burzy ma **2:14 / 240 kbps**. Szczegóły: [AUDIO_LICENSES.md](./AUDIO_LICENSES.md).
+
+### Tony i binaural
+- czyste tony: 174, 285, 396, 432, 528, 639, 741, 852, 963 Hz,
+- binaural: Delta 2 Hz, Theta 6 Hz, Alpha 10 Hz,
+- brak pseudomedycznych obietnic dotyczących konkretnych częstotliwości.
+
+### Programy
+- 7 dni wyciszenia,
+- 14 dni koncentracji,
+- 21 dni głębszej praktyki,
+- lokalny postęp programu.
+
+### Statystyki
+- liczba sesji,
+- łączny czas,
+- streak,
+- średnia długość sesji,
+- wykres ostatnich 7 dni,
+- tygodniowy rytm na ekranie głównym,
+- historia praktyk,
+- subiektywna zmiana check-in przed/po.
+
+## Pobranie audio
 
 ```bash
 chmod +x scripts/download-audio.sh
 ./scripts/download-audio.sh
 ```
 
-Audio nie jest wrzucane do Git, żeby repo pozostało lekkie. Aplikacja najpierw próbuje plików lokalnych; jeśli ich nie ma, ma awaryjne publiczne URL-e Wikimedia Commons.
+Pliki audio nie są wersjonowane w Git, dzięki czemu repo pozostaje lekkie.
 
-## Uruchomienie lokalne
-
-Ponieważ to statyczna PWA, nie potrzebujesz Node.js:
+## Lokalnie
 
 ```bash
 python3 -m http.server 8080
@@ -46,11 +105,7 @@ python3 -m http.server 8080
 
 Otwórz `http://localhost:8080`.
 
-> Service Worker/PWA działa na HTTPS lub na localhost. Zwykłe HTTP pod adresem IP na telefonie nie daje pełnego trybu instalowalnego PWA.
-
-## Ubuntu + Nginx, bez Dockera
-
-Na serwerze:
+## Ubuntu + Nginx bez Dockera
 
 ```bash
 git clone https://github.com/adrplociennik/medytacja-app.git
@@ -60,14 +115,7 @@ chmod +x deploy/install-ubuntu.sh
 ./deploy/install-ubuntu.sh medytacja.twojadomena.pl
 ```
 
-Skrypt:
-1. instaluje Nginx i curl,
-2. pobiera legalne pliki audio,
-3. kopiuje aplikację do `/var/www/still`,
-4. ustawia konfigurację Nginx,
-5. włącza i przeładowuje Nginx.
-
-Do instalacji PWA na telefonie dodaj HTTPS. Najprościej po ustawieniu DNS użyć certbota lub reverse proxy, którego już używasz.
+Instalator pobiera audio, kopiuje aplikację do `/var/www/still` i konfiguruje Nginx. Dla instalowalnej PWA na telefonie użyj HTTPS.
 
 ## Aktualizacja
 
@@ -77,19 +125,19 @@ git pull
 ./deploy/install-ubuntu.sh medytacja.twojadomena.pl
 ```
 
+## Walidacja
+
+Repo ma workflow GitHub Actions sprawdzający składnię JavaScript i podstawową integralność HTML:
+
+```bash
+node --check app.js
+python3 scripts/validate.py
+```
+
 ## Prywatność
 
-Nie ma serwera aplikacyjnego ani bazy użytkowników. Historia praktyki i ustawienia głośności są w przeglądarce urządzenia. Wyczyścienie danych strony usuwa historię.
+Historia, ustawienia, ulubione, check-in, programy i własny preset dźwięków są lokalne. Eksport danych tworzy plik JSON, który możesz zachować jako kopię.
 
-## Źródła koncepcyjne
+## Kierunek dalszego rozwoju
 
-Zakres funkcji był porównywany z oficjalnymi opisami Headspace, Calm i Insight Timer. Nie kopiujemy ich treści ani audio.
-
-- Headspace: https://www.headspace.com/app
-- Calm: https://support.calm.com/hc/en-us/articles/360044707294-What-Free-Content-is-Available-on-the-Calm-App
-- Insight Timer — timer: https://help.insighttimer.com/support/solutions/articles/67000691279-how-can-i-find-the-timer-
-- Insight Timer — sound mixer: https://help.insighttimer.com/support/solutions/articles/67000753813-how-do-i-find-the-sleep-mixer-
-
-## Następne sensowne rozszerzenia
-
-Kolejny etap może dodać nagrane polskie prowadzenie głosowe, własne presety miksera, harmonogram przypomnień, tryb snu z wygaszaniem audio oraz eksport/import historii bez konieczności budowania backendu.
+Największy następny skok jakości to przygotowane wcześniej **polskie prowadzenie głosowe**, większy bank długich field recordings, prawdziwe wielowarstwowe sceny z losowymi zdarzeniami oraz bardziej zaawansowany silnik crossfade dla nagrań tła.
