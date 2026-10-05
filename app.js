@@ -243,7 +243,7 @@ function renderSessions(){
       "<span class='session-meta'><strong>"+session.minutes+" min</strong><span>"+session.method+"</span></span>"+
       "</button>";
   }).join(""):"<div class='empty-state'>Nie masz jeszcze ulubionych praktyk. Dodaj je gwiazdką w playerze.</div>";
-  $$("[data-session]").forEach(button=>button.addEventListener("click",()=>startSession(button.dataset.session)));
+  $("#sessionList [data-session]").forEach(button=>button.addEventListener("click",()=>startSession(button.dataset.session)));
 }
 
 function chooseRecommendation(){
@@ -772,6 +772,7 @@ function updateBreath(){
   $("#breathTotal").textContent=formatTime(breathPlayer.total);
   $("#toggleBreath").textContent=breathPlayer.running?"Pauza":"Wznów";
   const orb=$("#breathOrb");
+  orb.style.transitionDuration=Math.max(.5,info.duration*.88)+"s";
   orb.classList.remove("inhale","hold","exhale","rest");
   orb.classList.add(info.type);
 }
@@ -921,6 +922,7 @@ function setupEvents(){
   $("#minusMinute").addEventListener("click",()=>{timerMinutes=Math.max(1,timerMinutes-1);$("#timerMinutes").textContent=timerMinutes});
   $("#plusMinute").addEventListener("click",()=>{timerMinutes=Math.min(90,timerMinutes+1);$("#timerMinutes").textContent=timerMinutes});
   $("#startCustomTimer").addEventListener("click",()=>startSession(customSession(timerMinutes)));
+  $(".mode-grid [data-session]").forEach(button=>button.addEventListener("click",()=>startSession(button.dataset.session)));
 
   $("#sosButton").addEventListener("click",()=>startSession("sos-2",{preMood:1}));
   $("#sleepShortcut").addEventListener("click",startSleepMode);
