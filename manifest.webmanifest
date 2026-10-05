@@ -1,0 +1,22 @@
+{
+  "name": "Still — medytacja",
+  "short_name": "Still",
+  "description": "Prywatna aplikacja do medytacji, krótkich praktyk i soundscape'ów.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d1713",
+  "theme_color": "#0d1713",
+  "lang": "pl",
+  "categories": ["health", "lifestyle"],
+  "icons": [
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
