@@ -239,13 +239,15 @@ function closeDialog(selector){
 }
 function markAppError(error){
   console.error("Still runtime error",error);
+  const message=String(error&&error.message?error.message:error||"Unknown error");
   document.body.dataset.appReady="error";
+  document.body.dataset.appError=message;
   let banner=$("#appErrorBanner");
   if(!banner){
     banner=document.createElement("div");
     banner.id="appErrorBanner";
     banner.className="app-error-banner";
-    banner.textContent="Coś zatrzymało aplikację. Odśwież stronę; jeśli problem wraca, zaktualizuj Still z GitHuba.";
+    banner.textContent="Still nie uruchomił logiki: "+message;
     document.body.appendChild(banner);
   }
 }
