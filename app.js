@@ -123,7 +123,8 @@ const sounds=[
   {id:"forest",name:"Las",note:"ptaki i naturalne tło",file:"audio/forest.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/3/38/Birds_forest.ogg"},
   {id:"fire",name:"Ogień",note:"palenisko",file:"audio/fire.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/d/d8/Dry_grass_burning_in_open_fireplace.ogg"},
   {id:"wind",name:"Wiatr",note:"naturalny podmuch",file:"audio/wind.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/2/2d/Howling_wind.ogg"},
-  {id:"chimes",name:"Dzwonki",note:"metalowe wind chimes",file:"audio/chimes.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/2/28/Windchime.ogg"},\n  {id:"storm",name:"Deszcz + burza",note:"2:14 · 240 kbps · field recording",file:"audio/storm.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/c/cb/Rainthunderandbirds.ogg"}
+  {id:"chimes",name:"Dzwonki",note:"metalowe wind chimes",file:"audio/chimes.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/2/28/Windchime.ogg"},
+  {id:"storm",name:"Deszcz + burza",note:"2:14 · 240 kbps · field recording",file:"audio/storm.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/c/cb/Rainthunderandbirds.ogg"}
 ];
 
 const scenes=[
@@ -941,7 +942,8 @@ function setupEvents(){
 
   $("#tutorialButton").addEventListener("click",()=>$("#tutorialDialog").showModal());
   $("#desktopTutorialButton").addEventListener("click",()=>$("#tutorialDialog").showModal());
-  $("#settingsButton").addEventListener("click",()=>{$("#settingsDialog").showModal();syncSettingsUI()});\n  $("#mobileSettingsButton").addEventListener("click",()=>{$("#settingsDialog").showModal();syncSettingsUI()});
+  $("#settingsButton").addEventListener("click",()=>{$("#settingsDialog").showModal();syncSettingsUI()});
+  $("#mobileSettingsButton").addEventListener("click",()=>{$("#settingsDialog").showModal();syncSettingsUI()});
 
   $("#gongEnabled").addEventListener("change",e=>{settings.gongEnabled=e.target.checked;saveSettings()});
   $("#gongType").addEventListener("change",e=>{settings.gongType=e.target.value;saveSettings()});
