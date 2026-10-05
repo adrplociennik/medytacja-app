@@ -6,6 +6,12 @@ async function openStill(page, width=390, height=844) {
   const pageErrors = [];
   page.on("pageerror", error => pageErrors.push(error.message));
   await page.goto("http://127.0.0.1:4173", { waitUntil: "networkidle" });
+  await page.waitForFunction(() => document.body.dataset.appReady === "true" || document.body.dataset.appReady === "error");
+  const state = await page.locator("body").getAttribute("data-app-ready");
+  if (state === "error") {
+    const message = await page.locator("body").getAttribute("data-app-error");
+    throw new Error("Still init failed: " + message);
+  }
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   return pageErrors;
 }
