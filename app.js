@@ -119,15 +119,15 @@ const sessions=[
 
 const sounds=[
   {id:"rain",name:"Deszcz",note:"prawdziwy deszcz",file:"audio/rain.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/0/0e/Rain_%281%29.ogg"},
-  {id:"ocean",name:"Ocean",note:"fale na plaży",file:"audio/ocean.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/6/64/Ocean_Waves_on_a_Tropical_Beach.ogg"},
+  {id:"ocean",name:"Ocean HD",note:"4:47 · 485 kbps · shotgun mic",file:"audio/ocean.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Waves.ogg"},
   {id:"forest",name:"Las",note:"ptaki i naturalne tło",file:"audio/forest.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/3/38/Birds_forest.ogg"},
   {id:"fire",name:"Ogień",note:"palenisko",file:"audio/fire.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/d/d8/Dry_grass_burning_in_open_fireplace.ogg"},
   {id:"wind",name:"Wiatr",note:"naturalny podmuch",file:"audio/wind.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/2/2d/Howling_wind.ogg"},
-  {id:"chimes",name:"Dzwonki",note:"metalowe wind chimes",file:"audio/chimes.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/2/28/Windchime.ogg"}
+  {id:"chimes",name:"Dzwonki",note:"metalowe wind chimes",file:"audio/chimes.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/2/28/Windchime.ogg"},\n  {id:"storm",name:"Deszcz + burza",note:"2:14 · 240 kbps · field recording",file:"audio/storm.ogg",remote:"https://upload.wikimedia.org/wikipedia/commons/c/cb/Rainthunderandbirds.ogg"}
 ];
 
 const scenes=[
-  {id:"rain-room",name:"Deszcz",note:"miękko i równo",mix:{rain:.72,wind:.08}},
+  {id:"rain-room",name:"Deszcz",note:"warstwowy deszcz",mix:{rain:.48,storm:.28,wind:.05}},
   {id:"night-fire",name:"Wieczór",note:"ogień + wiatr",mix:{fire:.58,wind:.12,chimes:.05}},
   {id:"forest-air",name:"Las",note:"ptaki + powietrze",mix:{forest:.62,wind:.10}},
   {id:"deep-ocean",name:"Ocean",note:"fale + wiatr",mix:{ocean:.65,wind:.08}},
@@ -826,7 +826,7 @@ async function startSleepAudio(){
   clearSleepTimers();
   const minutes=Number($("#sleepMinutes").value);
   const sceneMap={
-    rain:{rain:.72,wind:.06},
+    rain:{rain:.48,storm:.26,wind:.04},
     ocean:{ocean:.68,wind:.05},
     fire:{fire:.58,wind:.05}
   };
@@ -941,7 +941,7 @@ function setupEvents(){
 
   $("#tutorialButton").addEventListener("click",()=>$("#tutorialDialog").showModal());
   $("#desktopTutorialButton").addEventListener("click",()=>$("#tutorialDialog").showModal());
-  $("#settingsButton").addEventListener("click",()=>{$("#settingsDialog").showModal();syncSettingsUI()});
+  $("#settingsButton").addEventListener("click",()=>{$("#settingsDialog").showModal();syncSettingsUI()});\n  $("#mobileSettingsButton").addEventListener("click",()=>{$("#settingsDialog").showModal();syncSettingsUI()});
 
   $("#gongEnabled").addEventListener("change",e=>{settings.gongEnabled=e.target.checked;saveSettings()});
   $("#gongType").addEventListener("change",e=>{settings.gongType=e.target.value;saveSettings()});
