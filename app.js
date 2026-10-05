@@ -195,10 +195,59 @@ function formatTime(sec){
 }
 function showToast(message){
   const toast=$("#toast");
+  if(!toast)return;
   toast.textContent=message;
   toast.classList.add("show");
   clearTimeout(toast._timer);
   toast._timer=setTimeout(()=>toast.classList.remove("show"),2300);
+}
+function bind(selector,event,handler,root=document){
+  const el=$(selector,root);
+  if(!el)return null;
+  el.addEventListener(event,handler);
+  return el;
+}
+function bindAll(selector,event,handler,root=document){
+  $(selector,root).forEach(el=>el.addEventListener(event,handler));
+}
+function openDialog(selector){
+  const dialog=typeof selector==="string"?$(selector):selector;
+  if(!dialog)return false;
+  try{
+    if(typeof dialog.showModal==="function"){
+      if(!dialog.open)dialog.showModal();
+    }else{
+      dialog.setAttribute("open","");
+      dialog.classList.add("fallback-open");
+    }
+    return true;
+  }catch(error){
+    console.error("Still dialog open error",error);
+    return false;
+  }
+}
+function closeDialog(selector){
+  const dialog=typeof selector==="string"?$(selector):selector;
+  if(!dialog)return;
+  try{
+    if(typeof dialog.close==="function"&&dialog.open)dialog.close();
+    else{
+      dialog.removeAttribute("open");
+      dialog.classList.remove("fallback-open");
+    }
+  }catch(error){console.error("Still dialog close error",error)}
+}
+function markAppError(error){
+  console.error("Still runtime error",error);
+  document.body.dataset.appReady="error";
+  let banner=$("#appErrorBanner");
+  if(!banner){
+    banner=document.createElement("div");
+    banner.id="appErrorBanner";
+    banner.className="app-error-banner";
+    banner.textContent="Coś zatrzymało aplikację. Odśwież stronę; jeśli problem wraca, zaktualizuj Still z GitHuba.";
+    document.body.appendChild(banner);
+  }
 }
 function ensureAudioContext(){
   audioContext=audioContext||new (window.AudioContext||window.webkitAudioContext)();
@@ -362,7 +411,7 @@ async function startSession(idOrSession,options={}){
   };
   $("#playerMethod").textContent=session.method;
   $("#playerTitle").textContent=session.title;
-  $("#playerDialog").showModal();
+  openDialog("#playerDialog");
   updateFavoriteCurrent();
   updatePlayer();
   if(settings.gongStart)playGong(1);
@@ -439,8 +488,8 @@ function finishSession(save=false,completed=false){
   if(save)addHistory(snapshot.session,{preMood:snapshot.preMood,programId:snapshot.programId});
   player=null;
   releaseWakeLock();
-  if($("#playerDialog").open)$("#playerDialog").close();
-  if(completed)setTimeout(()=>$("#postSessionDialog").showModal(),850);
+  closeDialog("#playerDialog");
+  if(completed)setTimeout(()=>openDialog("#postSessionDialog"),850);
 }
 function completeSession(){
   if(!player)return;
@@ -733,7 +782,7 @@ function startBreath(id){
   breathPlayer={pattern,total:pattern.minutes*60,elapsed:0,running:true,lastTick:Date.now(),lastPhaseKey:""};
   $("#breathTitle").textContent=pattern.title;
   $("#breathDescription").textContent=pattern.desc;
-  $("#breathDialog").showModal();
+  openDialog("#breathDialog");
   updateBreath();
   clearInterval(breathTick);
   breathTick=setInterval(()=>{
@@ -797,7 +846,7 @@ function finishBreath(completed=false){
   }
   breathPlayer=null;
   releaseWakeLock();
-  if($("#breathDialog").open)$("#breathDialog").close();
+  closeDialog("#breathDialog");
 }
 
 function renderPrograms(){
@@ -822,7 +871,7 @@ function startProgram(id){
 }
 
 function startSleepMode(){
-  $("#sleepDialog").showModal();
+  openDialog("#sleepDialog");
 }
 async function startSleepAudio(){
   clearSleepTimers();
@@ -862,7 +911,7 @@ async function startSleepAudio(){
     sleepState.timers.push(interval);
   },fadeStart);
   sleepState.timers.push(fadeTimer);
-  $("#sleepDialog").close();
+  closeDialog("#sleepDialog");
   showToast("Sleep mode: dźwięk wygaśnie za "+minutes+" min");
 }
 function clearSleepTimers(){
@@ -910,6 +959,12 @@ function navObserver(){
   const links=[...$$(".bottom-nav a"),...$$(".side-nav a")];
   const sectionIds=[...new Set(links.map(a=>a.getAttribute("href")).filter(Boolean))];
   const sections=sectionIds.map(id=>$(id)).filter(Boolean);
+  if(!("IntersectionObserver" in window)){
+    links.forEach(link=>link.addEventListener("click",()=>{
+      links.forEach(item=>item.classList.toggle("active",item.getAttribute("href")===link.getAttribute("href")));
+    }));
+    return;
+  }
   const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
     if(entry.isIntersecting){
       links.forEach(link=>link.classList.toggle("active",link.getAttribute("href")==="#"+entry.target.id));
@@ -919,119 +974,134 @@ function navObserver(){
 }
 
 function setupEvents(){
-  $("#minusMinute").addEventListener("click",()=>{timerMinutes=Math.max(1,timerMinutes-1);$("#timerMinutes").textContent=timerMinutes});
-  $("#plusMinute").addEventListener("click",()=>{timerMinutes=Math.min(90,timerMinutes+1);$("#timerMinutes").textContent=timerMinutes});
-  $("#startCustomTimer").addEventListener("click",()=>startSession(customSession(timerMinutes)));
-  $(".mode-grid [data-session]").forEach(button=>button.addEventListener("click",()=>startSession(button.dataset.session)));
+  bind("#minusMinute","click",()=>{timerMinutes=Math.max(1,timerMinutes-1);const el=$("#timerMinutes");if(el)el.textContent=timerMinutes});
+  bind("#plusMinute","click",()=>{timerMinutes=Math.min(90,timerMinutes+1);const el=$("#timerMinutes");if(el)el.textContent=timerMinutes});
+  bind("#startCustomTimer","click",()=>startSession(customSession(timerMinutes)));
+  bindAll(".mode-grid [data-session]","click",event=>startSession(event.currentTarget.dataset.session));
 
-  $("#sosButton").addEventListener("click",()=>startSession("sos-2",{preMood:1}));
-  $("#sleepShortcut").addEventListener("click",startSleepMode);
-  $("#startSleepMeditation").addEventListener("click",()=>{$("#sleepDialog").close();startSession("sleep-10")});
-  $("#startSleepAudio").addEventListener("click",startSleepAudio);
-  $("#closeSleep").addEventListener("click",()=>$("#sleepDialog").close());
-  $$(".sleep-scene").forEach(button=>button.addEventListener("click",()=>{
+  bind("#sosButton","click",()=>startSession("sos-2",{preMood:1}));
+  bind("#sleepShortcut","click",startSleepMode);
+  bind("#startSleepMeditation","click",()=>{closeDialog("#sleepDialog");startSession("sleep-10")});
+  bind("#startSleepAudio","click",startSleepAudio);
+  bind("#closeSleep","click",()=>closeDialog("#sleepDialog"));
+  bindAll(".sleep-scene","click",event=>{
     $$(".sleep-scene").forEach(x=>x.classList.remove("active"));
-    button.classList.add("active");
-    sleepState.scene=button.dataset.sleepScene;
-  }));
+    event.currentTarget.classList.add("active");
+    sleepState.scene=event.currentTarget.dataset.sleepScene;
+  });
 
-  $$("#sessionFilters [data-filter]").forEach(button=>button.addEventListener("click",()=>{
+  bindAll("#sessionFilters [data-filter]","click",event=>{
     $$("#sessionFilters .filter-chip").forEach(x=>x.classList.remove("active"));
-    button.classList.add("active");
-    activeSessionFilter=button.dataset.filter;
+    event.currentTarget.classList.add("active");
+    activeSessionFilter=event.currentTarget.dataset.filter;
     renderSessions();
-  }));
+  });
 
-  $("#tutorialButton").addEventListener("click",()=>$("#tutorialDialog").showModal());
-  $("#desktopTutorialButton").addEventListener("click",()=>$("#tutorialDialog").showModal());
-  $("#settingsButton").addEventListener("click",()=>{$("#settingsDialog").showModal();syncSettingsUI()});
-  $("#mobileSettingsButton").addEventListener("click",()=>{$("#settingsDialog").showModal();syncSettingsUI()});
+  bind("#tutorialButton","click",()=>openDialog("#tutorialDialog"));
+  bind("#desktopTutorialButton","click",()=>openDialog("#tutorialDialog"));
+  bind("#settingsButton","click",()=>{syncSettingsUI();openDialog("#settingsDialog")});
+  bind("#mobileSettingsButton","click",()=>{syncSettingsUI();openDialog("#settingsDialog")});
 
-  $("#gongEnabled").addEventListener("change",e=>{settings.gongEnabled=e.target.checked;saveSettings()});
-  $("#gongType").addEventListener("change",e=>{settings.gongType=e.target.value;saveSettings()});
-  $("#gongVolume").addEventListener("input",e=>{settings.gongVolume=Number(e.target.value);saveSettings()});
-  $("#gongStart").addEventListener("change",e=>{settings.gongStart=e.target.checked;saveSettings()});
-  $("#gongEnd").addEventListener("change",e=>{settings.gongEnd=e.target.checked;saveSettings()});
-  $("#hapticsEnabled").addEventListener("change",e=>{settings.haptics=e.target.checked;saveSettings()});
-  $("#testGong").addEventListener("click",()=>{ensureAudioContext();playGong(1)});
+  bind("#gongEnabled","change",event=>{settings.gongEnabled=event.target.checked;saveSettings()});
+  bind("#gongType","change",event=>{settings.gongType=event.target.value;saveSettings()});
+  bind("#gongVolume","input",event=>{settings.gongVolume=Number(event.target.value);saveSettings()});
+  bind("#gongStart","change",event=>{settings.gongStart=event.target.checked;saveSettings()});
+  bind("#gongEnd","change",event=>{settings.gongEnd=event.target.checked;saveSettings()});
+  bind("#hapticsEnabled","change",event=>{settings.haptics=event.target.checked;saveSettings()});
+  bind("#testGong","click",()=>{ensureAudioContext();playGong(1)});
 
-  $("#togglePlayer").addEventListener("click",()=>togglePlayer());
-  $("#previousPhase").addEventListener("click",()=>jumpPhase(-1));
-  $("#nextPhase").addEventListener("click",()=>jumpPhase(1));
-  $("#finishSession").addEventListener("click",()=>finishSession(false,false));
-  $("#closePlayer").addEventListener("click",()=>finishSession(false,false));
-  $("#favoriteCurrent").addEventListener("click",toggleFavoriteCurrent);
-  $("#playerDialog").addEventListener("cancel",e=>{e.preventDefault();finishSession(false,false)});
-  $("#playerGongToggle").addEventListener("click",()=>{settings.gongEnabled=!settings.gongEnabled;saveSettings();showToast(settings.gongEnabled?"Gong włączony":"Gong wyłączony")});
-  $("#playerSoundShortcut").addEventListener("click",()=>{finishSession(false,false);location.hash="sounds";showToast("Sesja zamknięta — ustaw dźwięk i uruchom ponownie")});
+  bind("#togglePlayer","click",()=>togglePlayer());
+  bind("#previousPhase","click",()=>jumpPhase(-1));
+  bind("#nextPhase","click",()=>jumpPhase(1));
+  bind("#finishSession","click",()=>finishSession(false,false));
+  bind("#closePlayer","click",()=>finishSession(false,false));
+  bind("#favoriteCurrent","click",toggleFavoriteCurrent);
+  bind("#playerDialog","cancel",event=>{event.preventDefault();finishSession(false,false)});
+  bind("#playerGongToggle","click",()=>{
+    settings.gongEnabled=!settings.gongEnabled;
+    saveSettings();
+    showToast(settings.gongEnabled?"Gong włączony":"Gong wyłączony");
+  });
+  bind("#playerSoundShortcut","click",()=>{
+    finishSession(false,false);
+    location.hash="sounds";
+    showToast("Ustaw dźwięk i uruchom sesję ponownie");
+  });
 
-  $("#stopAllSounds").addEventListener("click",stopAllSounds);
-  $("#savePreset").addEventListener("click",saveUserPreset);
-  $("#loadPreset").addEventListener("click",loadUserPreset);
-  $("#masterVolume").addEventListener("input",e=>{
-    masterVolume=Number(e.target.value);
+  bind("#stopAllSounds","click",stopAllSounds);
+  bind("#savePreset","click",saveUserPreset);
+  bind("#loadPreset","click",loadUserPreset);
+  bind("#masterVolume","input",event=>{
+    masterVolume=Number(event.target.value);
     localStorage.setItem(STORE.master,String(masterVolume));
     syncAudioVolumes();
   });
-  $("#stopFrequency").addEventListener("click",stopFrequency);
+  bind("#stopFrequency","click",stopFrequency);
 
-  $("#closeBreath").addEventListener("click",()=>finishBreath(false));
-  $("#toggleBreath").addEventListener("click",toggleBreath);
-  $("#breathMinus").addEventListener("click",()=>changeBreathMinutes(-1));
-  $("#breathPlus").addEventListener("click",()=>changeBreathMinutes(1));
-  $("#breathDialog").addEventListener("cancel",e=>{e.preventDefault();finishBreath(false)});
+  bind("#closeBreath","click",()=>finishBreath(false));
+  bind("#toggleBreath","click",toggleBreath);
+  bind("#breathMinus","click",()=>changeBreathMinutes(-1));
+  bind("#breathPlus","click",()=>changeBreathMinutes(1));
+  bind("#breathDialog","cancel",event=>{event.preventDefault();finishBreath(false)});
 
-  $("#clearHistory").addEventListener("click",()=>{
+  bind("#clearHistory","click",()=>{
     localStorage.removeItem(STORE.history);
     renderProgress();
     showToast("Historia wyczyszczona");
   });
-  $$("#postMoodChoices [data-score]").forEach(button=>button.addEventListener("click",()=>savePostMood(button.dataset.score)));
+  bindAll("#postMoodChoices [data-score]","click",event=>savePostMood(event.currentTarget.dataset.score));
 
-  $("#exportData").addEventListener("click",exportData);
-  $("#importData").addEventListener("change",e=>importDataFile(e.target.files&&e.target.files[0]));
+  bind("#exportData","click",exportData);
+  bind("#importData","change",event=>importDataFile(event.target.files&&event.target.files[0]));
 
   window.addEventListener("beforeinstallprompt",event=>{
     event.preventDefault();
     deferredInstall=event;
-    $("#installButton").classList.remove("hidden");
-    $("#desktopInstallButton").classList.remove("hidden");
+    $("#installButton")?.classList.remove("hidden");
+    $("#desktopInstallButton")?.classList.remove("hidden");
   });
+
   const install=async()=>{
-    if(!deferredInstall)return;
+    if(!deferredInstall){showToast("Instalacja PWA pojawi się, gdy przeglądarka ją udostępni");return}
     deferredInstall.prompt();
     await deferredInstall.userChoice;
     deferredInstall=null;
-    $("#installButton").classList.add("hidden");
-    $("#desktopInstallButton").classList.add("hidden");
+    $("#installButton")?.classList.add("hidden");
+    $("#desktopInstallButton")?.classList.add("hidden");
   };
-  $("#installButton").addEventListener("click",install);
-  $("#desktopInstallButton").addEventListener("click",install);
+  bind("#installButton","click",install);
+  bind("#desktopInstallButton","click",install);
 
   document.addEventListener("visibilitychange",()=>{
-    if(document.visibilityState==="visible"&&(player&&player.running||breathPlayer&&breathPlayer.running))requestWakeLock();
+    if(document.visibilityState==="visible"&&((player&&player.running)||(breathPlayer&&breathPlayer.running)))requestWakeLock();
   });
 }
 
 function init(){
-  setupHeader();
-  renderSessions();
-  renderBreaths();
-  renderScenes();
-  renderSounds();
-  renderFrequencies();
-  renderPrograms();
-  renderProgress();
-  syncSettingsUI();
-  setupCheckin();
-  setupEvents();
-  navObserver();
-  if(!localStorage.getItem(STORE.tutorial)){
-    setTimeout(()=>$("#tutorialDialog").showModal(),550);
-    localStorage.setItem(STORE.tutorial,"1");
-  }
-  if("serviceWorker" in navigator){
-    window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+  try{
+    setupHeader();
+    renderSessions();
+    renderBreaths();
+    renderScenes();
+    renderSounds();
+    renderFrequencies();
+    renderPrograms();
+    renderProgress();
+    syncSettingsUI();
+    setupCheckin();
+    setupEvents();
+    navObserver();
+    document.body.dataset.appReady="true";
+    if(!localStorage.getItem(STORE.tutorial)){
+      setTimeout(()=>openDialog("#tutorialDialog"),550);
+      localStorage.setItem(STORE.tutorial,"1");
+    }
+    if("serviceWorker" in navigator){
+      window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(error=>console.warn("SW",error)));
+    }
+  }catch(error){
+    markAppError(error);
   }
 }
+window.addEventListener("error",event=>{if(document.body.dataset.appReady!=="true")markAppError(event.error||event.message)});
 init();
