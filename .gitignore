@@ -1,0 +1,4 @@
+audio/*.ogg
+audio/*.part
+.DS_Store
+Thumbs.db

@@ -1,0 +1,12 @@
+{
+  "name": "still-meditation-pwa",
+  "private": true,
+  "version": "2.1.0",
+  "description": "Private meditation PWA; Node is used only for browser tests.",
+  "scripts": {
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}
