@@ -208,7 +208,7 @@ function bind(selector,event,handler,root=document){
   return el;
 }
 function bindAll(selector,event,handler,root=document){
-  $(selector,root).forEach(el=>el.addEventListener(event,handler));
+  $$(selector,root).forEach(el=>el.addEventListener(event,handler));
 }
 function openDialog(selector){
   const dialog=typeof selector==="string"?$(selector):selector;
@@ -294,7 +294,7 @@ function renderSessions(){
       "<span class='session-meta'><strong>"+session.minutes+" min</strong><span>"+session.method+"</span></span>"+
       "</button>";
   }).join(""):"<div class='empty-state'>Nie masz jeszcze ulubionych praktyk. Dodaj je gwiazdką w playerze.</div>";
-  $("#sessionList [data-session]").forEach(button=>button.addEventListener("click",()=>startSession(button.dataset.session)));
+  $$("#sessionList [data-session]").forEach(button=>button.addEventListener("click",()=>startSession(button.dataset.session)));
 }
 
 function chooseRecommendation(){
