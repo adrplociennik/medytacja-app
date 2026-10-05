@@ -37,7 +37,7 @@ jobs:
       - name: Install browser test tools
         run: |
           npm install
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
 
       - name: Start Still
         run: |
