@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0d1713">
+  <meta name="description" content="Prywatna aplikacja do medytacji, krótkich praktyk i soundscape'ów.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Still — medytacja</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Still — strona główna">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Still</span>
+      </a>
+      <div class="top-actions">
+        <button id="installButton" class="icon-button hidden" type="button" aria-label="Zainstaluj aplikację">＋</button>
+        <button id="tutorialButton" class="icon-button" type="button" aria-label="Pokaż tutorial">?</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="home" class="hero section">
+        <div class="eyebrow">Dzisiaj</div>
+        <h1>Znajdź kilka minut ciszy.</h1>
+        <p class="hero-copy">Bez konta, reklam i rozpraszaczy. Wybierz praktykę albo ustaw własny timer.</p>
+
+        <div class="quick-grid">
+          <button class="quick-card accent" data-session="reset-3">
+            <span class="quick-time">3 min</span>
+            <strong>Szybki reset</strong>
+            <span>oddech + rozluźnienie</span>
+          </button>
+          <button class="quick-card" data-session="cleanse-7">
+            <span class="quick-time">7 min</span>
+            <strong>Oczyszczająca</strong>
+            <span>oddech + skan ciała</span>
+          </button>
+          <button class="quick-card" data-session="deep-20">
+            <span class="quick-time">20 min</span>
+            <strong>Głęboka</strong>
+            <span>cisza + open monitoring</span>
+          </button>
+        </div>
+
+        <div class="timer-card card">
+          <div>
+            <div class="eyebrow">Własna sesja</div>
+            <h2>Timer medytacji</h2>
+          </div>
+          <div class="timer-control">
+            <button id="minusMinute" class="round-button" type="button" aria-label="Odejmij minutę">−</button>
+            <div class="timer-value"><strong id="timerMinutes">10</strong><span>min</span></div>
+            <button id="plusMinute" class="round-button" type="button" aria-label="Dodaj minutę">＋</button>
+          </div>
+          <button id="startCustomTimer" class="primary-button" type="button">Rozpocznij timer</button>
+        </div>
+      </section>
+
+      <section id="practice" class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Biblioteka</div>
+            <h2>Praktyki</h2>
+          </div>
+          <span class="muted">od 3 do 30 min</span>
+        </div>
+        <div id="sessionList" class="session-list"></div>
+      </section>
+
+      <section id="sounds" class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Prawdziwe nagrania</div>
+            <h2>Soundscape mixer</h2>
+          </div>
+          <button id="stopAllSounds" class="text-button" type="button">Wycisz wszystko</button>
+        </div>
+        <p class="section-copy">Możesz łączyć kilka warstw. Pliki są pobierane lokalnie przez skrypt instalacyjny; gdy ich brak, aplikacja spróbuje źródła publicznego.</p>
+        <div id="soundList" class="sound-grid"></div>
+      </section>
+
+      <section id="frequencies" class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Generator</div>
+            <h2>Częstotliwości</h2>
+          </div>
+          <button id="stopFrequency" class="text-button" type="button">Wyłącz</button>
+        </div>
+        <div class="notice">
+          To narzędzie generuje tony i binaural beats do eksperymentalnego użycia podczas relaksu. Nie przypisujemy im działania leczniczego. Przy binaural beats używaj słuchawek i niskiej głośności.
+        </div>
+        <div id="frequencyList" class="frequency-grid"></div>
+      </section>
+
+      <section id="progress" class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Lokalnie na tym urządzeniu</div>
+            <h2>Twoja praktyka</h2>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat card"><strong id="statSessions">0</strong><span>sesji</span></div>
+          <div class="stat card"><strong id="statMinutes">0</strong><span>minut</span></div>
+          <div class="stat card"><strong id="statStreak">0</strong><span>dni z rzędu</span></div>
+        </div>
+        <div class="card history-card">
+          <div class="card-title-row"><h3>Ostatnie sesje</h3><button id="clearHistory" class="text-button danger" type="button">Wyczyść</button></div>
+          <div id="historyList" class="history-list"></div>
+        </div>
+      </section>
+
+      <section class="section about-section">
+        <div class="card">
+          <div class="eyebrow">Jak używać</div>
+          <h2>Prosty rytuał</h2>
+          <ol class="ritual-list">
+            <li><span>1</span><div><strong>Wybierz czas</strong><small>3 min wystarczą, jeśli masz mało czasu.</small></div></li>
+            <li><span>2</span><div><strong>Usiądź stabilnie</strong><small>Nie musisz siedzieć po turecku. Krzesło jest w porządku.</small></div></li>
+            <li><span>3</span><div><strong>Wróć do kotwicy</strong><small>Oddech, ciało albo dźwięk. Rozproszenie nie jest błędem.</small></div></li>
+            <li><span>4</span><div><strong>Zakończ spokojnie</strong><small>Po timerze daj sobie kilka oddechów przed wstaniem.</small></div></li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Główna nawigacja">
+      <a href="#home" class="active"><span>○</span>Start</a>
+      <a href="#practice"><span>◫</span>Praktyki</a>
+      <a href="#sounds"><span>≋</span>Dźwięki</a>
+      <a href="#progress"><span>⌁</span>Postęp</a>
+    </nav>
+  </div>
+
+  <dialog id="tutorialDialog" class="modal tutorial-modal">
+    <form method="dialog" class="modal-card">
+      <button class="modal-close" value="close" aria-label="Zamknij">×</button>
+      <div class="eyebrow">60 sekund i wiesz wszystko</div>
+      <h2>Jak korzystać ze Still</h2>
+      <div class="tutorial-steps">
+        <div><span>01</span><p><strong>Na szybko:</strong> kliknij jedną z kart 3, 7 lub 20 min na ekranie głównym.</p></div>
+        <div><span>02</span><p><strong>Pełna praktyka:</strong> wybierz metodę z biblioteki. Instrukcje zmieniają się automatycznie w trakcie sesji.</p></div>
+        <div><span>03</span><p><strong>Tło:</strong> w mikserze połącz deszcz, ocean, las, ogień, wiatr lub dzwonki. Każda warstwa ma osobną głośność.</p></div>
+        <div><span>04</span><p><strong>Offline:</strong> zainstaluj PWA i pobierz audio na serwer. Historia zostaje tylko w Twojej przeglądarce.</p></div>
+      </div>
+      <button class="primary-button full" value="close">Rozumiem</button>
+    </form>
+  </dialog>
+
+  <dialog id="playerDialog" class="modal player-modal">
+    <div class="player-card">
+      <button id="closePlayer" class="modal-close" type="button" aria-label="Zamknij sesję">×</button>
+      <div class="player-top">
+        <div class="eyebrow" id="playerMethod">Medytacja</div>
+        <h2 id="playerTitle">Szybki reset</h2>
+      </div>
+      <div class="progress-ring-wrap">
+        <svg class="progress-ring" viewBox="0 0 180 180" aria-hidden="true">
+          <circle class="ring-track" cx="90" cy="90" r="78"></circle>
+          <circle id="ringProgress" class="ring-progress" cx="90" cy="90" r="78"></circle>
+        </svg>
+        <div class="player-time"><strong id="playerTime">03:00</strong><span>pozostało</span></div>
+      </div>
+      <div class="phase-card">
+        <span id="phaseIndex">Etap 1</span>
+        <h3 id="phaseTitle">Przygotuj pozycję</h3>
+        <p id="phaseInstruction">Usiądź wygodnie i pozwól barkom opaść.</p>
+      </div>
+      <div class="player-controls">
+        <button id="previousPhase" class="round-button large" type="button" aria-label="Poprzedni etap">‹</button>
+        <button id="togglePlayer" class="play-button" type="button">Pauza</button>
+        <button id="nextPhase" class="round-button large" type="button" aria-label="Następny etap">›</button>
+      </div>
+      <div class="player-footer">
+        <button id="playerSoundShortcut" class="text-button" type="button">Mikser dźwięków</button>
+        <button id="finishSession" class="text-button" type="button">Zakończ teraz</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
